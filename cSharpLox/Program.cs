@@ -1,61 +1,62 @@
 ﻿using System.Text;
-
-public class Lox
+namespace interpreter.cSharpLox
 {
-    static Boolean hadError = false;
-    public static void main(String[] args)
+    public class Lox
     {
-        if (args.Length > 1)
+        static Boolean hadError = false;
+        public static void main(String[] args)
         {
-            Console.WriteLine("Usage: jlox [script]");
-            Environment.Exit(64);
+            if (args.Length > 1)
+            {
+                Console.WriteLine("Usage: jlox [script]");
+                Environment.Exit(64);
+            }
+            else if (args.Length == 1)
+            {
+                runFile(args[0]);
+            }
+            else
+            {
+                runPrompt();
+            }
         }
-        else if (args.Length == 1)
+
+        public static void runFile(String path)
         {
-            runFile(args[0]);
+            byte[] bytes = File.ReadAllBytes(path);
+            String content = Encoding.Default.GetString(bytes);
+            run(content);
+            if (hadError == true) Environment.Exit(65);
         }
-        else
+
+        private static void runPrompt()
         {
-            runPrompt();
+            for (; ; )
+            {
+                Console.Write(">");
+                var line = Console.ReadLine();
+                if (line == null) break;
+                run(line);
+                hadError = false;
+            }
         }
-    }
 
-    public static void runFile(String path)
-    {
-        byte[] bytes = File.ReadAllBytes(path);
-        String content = Encoding.Default.GetString(bytes);
-        run(content);
-        if (hadError == true) Environment.Exit(65);
-    }
-
-    private static void runPrompt()
-    {
-        for (; ; )
+        private static void run(String source)
         {
-            Console.Write(">");
-            var line = Console.ReadLine();
-            if (line == null) break;
-            run(line);
-            hadError = false;
+            Scanner scanner = new Scanner(source);
+            List<Token> tokens = scanner.ScanTokens();
+            tokens.ForEach((token) => Console.WriteLine(token));
         }
-    }
 
-    private static void run(String source)
-    {
-        Scanner scanner = new Scanner(source);
-        List<Token> tokens = scanner.ReadTokens();
-        tokens.ForEach((token) => Console.WriteLine(token));
-    }
+        public static void error(int line, String message)
+        {
+            report(line, "", message);
+        }
 
-    static void error(int line, String message)
-    {
-        report(line, "", message);
-    }
-
-    private static void report(int line, string where, string message)
-    {
-        Console.Error.WriteLine("[line" + line + "] Error" + where + " : " + message);
-        hadError = true;
+        private static void report(int line, string where, string message)
+        {
+            Console.Error.WriteLine("[line" + line + "] Error" + where + " : " + message);
+            hadError = true;
+        }
     }
 }
-

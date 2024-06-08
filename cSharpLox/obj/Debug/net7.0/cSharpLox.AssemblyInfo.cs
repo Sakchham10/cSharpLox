@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("cSharpLox")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+41553df9923c913642ced28a80bb41dcd2cbe583")]
 [assembly: System.Reflection.AssemblyProductAttribute("cSharpLox")]
 [assembly: System.Reflection.AssemblyTitleAttribute("cSharpLox")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
