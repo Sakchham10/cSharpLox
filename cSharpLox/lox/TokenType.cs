@@ -1,4 +1,4 @@
-namespace interpreter.cSharpLox
+namespace interpreter.lox
 {
     public enum TokenType
     {

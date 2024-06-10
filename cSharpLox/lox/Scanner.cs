@@ -1,4 +1,4 @@
-namespace interpreter.cSharpLox
+namespace interpreter.lox
 {
     public class Scanner
     {
@@ -27,6 +27,7 @@ namespace interpreter.cSharpLox
             keywords.Add("true", TokenType.TRUE);
             keywords.Add("var", TokenType.VAR);
             keywords.Add("while", TokenType.WHILE);
+            keywords.Add("and", TokenType.AND);
         }
 
         public Scanner(string source)
@@ -125,10 +126,12 @@ namespace interpreter.cSharpLox
                     if (isDigit(c))
                     {
                         numberFunc();
+                        break;
                     }
                     else if (isAlpha(c))
                     {
                         identifierFunc();
+                        break;
                     }
                     Lox.error(line, "Unexpected character.");
                     break;
@@ -161,13 +164,13 @@ namespace interpreter.cSharpLox
 
         private void addToken(TokenType type, Object literal)
         {
-            String text = source.Substring(start, current);
+            String text = source.Substring(start, current - start);
             tokens.Add(new Token(type, text, literal, line));
         }
 
         private bool isDigit(char c)
         {
-            return c >= 0 && c <= 9;
+            return c >= '0' && c <= '9';
         }
 
         private void stringFunc()
@@ -185,7 +188,7 @@ namespace interpreter.cSharpLox
             }
             //Consume the ending " character
             advance();
-            String value = source.Substring(start + 1, current - 1);
+            String value = source.Substring(start + 1, current - start - 1);
             addToken(TokenType.STRING, value);
         }
 
@@ -197,13 +200,16 @@ namespace interpreter.cSharpLox
                 advance();
                 while (isDigit(peek())) advance();
             }
-            addToken(TokenType.NUMBER, Double.Parse(source.Substring(start, current)));
+            addToken(TokenType.NUMBER, Double.Parse(source.Substring(start, current - start)));
         }
 
         private void identifierFunc()
         {
-            while (isAlphaNumeric(peek())) advance();
-            String text = source.Substring(start, current);
+            while (isAlphaNumeric(peek()))
+            {
+                advance();
+            }
+            String text = source.Substring(start, current - start);
             keywords.TryGetValue(text, out TokenType type);
             if ((int)type == 0) type = TokenType.IDENTIFIER;
             addToken(TokenType.IDENTIFIER, type);
@@ -211,7 +217,7 @@ namespace interpreter.cSharpLox
 
         private bool isAlpha(char c)
         {
-            return (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_');
+            return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_'));
         }
 
         private bool isAlphaNumeric(char c)

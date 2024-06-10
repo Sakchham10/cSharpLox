@@ -4,7 +4,7 @@ namespace interpreter.cSharpLox
     public class Lox
     {
         static Boolean hadError = false;
-        public static void main(String[] args)
+        public static void Main(String[] args)
         {
             if (args.Length > 1)
             {
@@ -44,8 +44,8 @@ namespace interpreter.cSharpLox
         private static void run(String source)
         {
             Scanner scanner = new Scanner(source);
-            List<Token> tokens = scanner.ScanTokens();
-            tokens.ForEach((token) => Console.WriteLine(token));
+            List<Token> tokens = scanner.scanTokens();
+            tokens.ForEach((token) => Console.WriteLine(token.toString()));
         }
 
         public static void error(int line, String message)
