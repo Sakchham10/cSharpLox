@@ -1,4 +1,5 @@
-namespace interpreter.lox
+using interpreter.lox.tokentype;
+namespace interpreter.lox.token
 {
     public class Token
     {

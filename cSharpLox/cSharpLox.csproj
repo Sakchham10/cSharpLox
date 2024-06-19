@@ -7,4 +7,12 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="tools\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="tools\GenerateAst.cs" />
+    </ItemGroup>
+
 </Project>

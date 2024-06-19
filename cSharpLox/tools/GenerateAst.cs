@@ -27,10 +27,14 @@ namespace interpreter.tools
             string path = outputDir + "/" + baseName + ".cs";
             StreamWriter writer = new StreamWriter(path, false);
 
-            writer.WriteLine("namespace interpreter.lox ;");
+            writer.WriteLine("using interpreter.lox.token;");
+            writer.WriteLine("namespace interpreter.lox.expr ;");
             writer.WriteLine();
             writer.WriteLine();
             writer.WriteLine("public abstract class " + baseName + " {");
+            writer.WriteLine();
+            writer.WriteLine("  protected abstract T accept<T>(Visitor<T> visitor);");
+            defineVisitor(writer, baseName, types);
             writer.WriteLine("}");
             foreach (string type in types)
             {
@@ -38,12 +42,12 @@ namespace interpreter.tools
                 string fields = type.Split(":")[1].Trim();
                 defineType(writer, baseName, className, fields);
             }
-            writer.WriteLine("}");
             writer.Close();
         }
 
         private static void defineType(StreamWriter writer, string baseName, string className, string fieldList)
         {
+
             writer.WriteLine("  public class " + className + " : " + baseName + " {");
 
             // Constructor.
@@ -57,6 +61,12 @@ namespace interpreter.tools
                 writer.WriteLine("_" + name + " = " + name + ";");
             }
 
+            writer.WriteLine("    }");
+            // Visitor pattern.
+            writer.WriteLine();
+            writer.WriteLine("    protected override T accept<T>(Visitor<T> visitor) {");
+            writer.WriteLine("      return visitor.visit" +
+                className + baseName + "(this);");
             writer.WriteLine("    }");
 
             // Fields.
@@ -80,6 +90,17 @@ namespace interpreter.tools
 
             writer.WriteLine("  }");
 
+        }
+
+        private static void defineVisitor(StreamWriter writer, string baseName, List<string> types)
+        {
+            writer.WriteLine(" protected interface Visitor<T> {");
+            foreach (string type in types)
+            {
+                string typeName = type.Split(":")[0].Trim();
+                writer.WriteLine(" T visit" + typeName + baseName + "(" + typeName + " " + baseName.ToLower() + ");");
+            }
+            writer.WriteLine("}");
         }
     }
 }

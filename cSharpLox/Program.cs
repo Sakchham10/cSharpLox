@@ -1,5 +1,8 @@
 ﻿using System.Text;
-namespace interpreter.cSharpLox
+using interpreter.lox.scanner;
+using interpreter.lox.token;
+
+namespace interpreter.lox
 {
     public class Lox
     {

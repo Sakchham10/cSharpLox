@@ -1,4 +1,8 @@
-namespace interpreter.lox
+using interpreter.lox.token;
+using interpreter.lox.tokentype;
+using interpreter.cSharpLox;
+
+namespace interpreter.lox.scanner
 {
     public class Scanner
     {
