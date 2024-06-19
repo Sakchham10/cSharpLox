@@ -1,2 +1,5 @@
 .idea
 cSharpLox.sln
+cSharpLox/bin
+cSharpLox/obj/
+*.exe
