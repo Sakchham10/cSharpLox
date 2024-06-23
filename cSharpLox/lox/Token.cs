@@ -3,10 +3,10 @@ namespace interpreter.lox.token
 {
     public class Token
     {
-        readonly TokenType type;
-        readonly String lexeme;
-        readonly Object literal;
-        readonly int line;
+        readonly public TokenType type;
+        readonly public String lexeme;
+        readonly public Object literal;
+        readonly public int line;
 
         public Token(TokenType type, String lexeme, Object literal, int line)
         {

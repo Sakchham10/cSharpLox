@@ -1,12 +1,11 @@
 using interpreter.lox.token;
 namespace interpreter.lox.expr;
 
-
 public abstract class Expr
 {
 
-    protected abstract T accept<T>(Visitor<T> visitor);
-    protected interface Visitor<T>
+    public abstract T accept<T>(Visitor<T> visitor);
+    public interface Visitor<T>
     {
         T visitBinaryExpr(Binary expr);
         T visitGroupingExpr(Grouping expr);
@@ -16,14 +15,14 @@ public abstract class Expr
 }
 public class Binary : Expr
 {
-    private Binary(Expr left, Token Operator, Expr right)
+    private Binary(Expr _left, Token _operator, Expr _right)
     {
-        _left = left;
-        _Operator = Operator;
-        _right = right;
+        left = _left;
+        oper = _operator;
+        right = _right;
     }
 
-    protected override T accept<T>(Visitor<T> visitor)
+    public override T accept<T>(Visitor<T> visitor)
     {
         return visitor.visitBinaryExpr(this);
     }
@@ -32,18 +31,18 @@ public class Binary : Expr
     {
         return new Binary(left, Operator, right);
     }
-    static Expr _left;
-    static Token _Operator;
-    static Expr _right;
+    public Expr left;
+    public Token oper;
+    public Expr right;
 }
 public class Grouping : Expr
 {
-    private Grouping(Expr expression)
+    private Grouping(Expr _expression)
     {
-        _expression = expression;
+        expression = _expression;
     }
 
-    protected override T accept<T>(Visitor<T> visitor)
+    public override T accept<T>(Visitor<T> visitor)
     {
         return visitor.visitGroupingExpr(this);
     }
@@ -52,16 +51,16 @@ public class Grouping : Expr
     {
         return new Grouping(expression);
     }
-    static Expr _expression;
+    public Expr expression;
 }
 public class Literal : Expr
 {
-    private Literal(Object value)
+    private Literal(Object _value)
     {
-        _value = value;
+        value = _value;
     }
 
-    protected override T accept<T>(Visitor<T> visitor)
+    public override T accept<T>(Visitor<T> visitor)
     {
         return visitor.visitLiteralExpr(this);
     }
@@ -70,17 +69,17 @@ public class Literal : Expr
     {
         return new Literal(value);
     }
-    static Object _value;
+    public Object value;
 }
 public class Unary : Expr
 {
-    private Unary(Token Operator, Expr right)
+    private Unary(Token _operator, Expr _right)
     {
-        _Operator = Operator;
-        _right = right;
+        oper = _operator;
+        right = _right;
     }
 
-    protected override T accept<T>(Visitor<T> visitor)
+    public override T accept<T>(Visitor<T> visitor)
     {
         return visitor.visitUnaryExpr(this);
     }
@@ -89,6 +88,6 @@ public class Unary : Expr
     {
         return new Unary(Operator, right);
     }
-    static Token _Operator;
-    static Expr _right;
+    public Token oper;
+    public Expr right;
 }

@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using interpreter.lox.scanner;
 using interpreter.lox.token;
+using static interpreter.lox.tokentype.TokenType;
 
 namespace interpreter.lox
 {
@@ -60,6 +61,18 @@ namespace interpreter.lox
         {
             Console.Error.WriteLine("[line" + line + "] Error" + where + " : " + message);
             hadError = true;
+        }
+
+        public static void error(Token token, string message)
+        {
+            if (token.type == EOF)
+            {
+                report(token.line, " at end", message);
+            }
+            else
+            {
+                report(token.line, " at '" + token.lexeme + "'", message);
+            }
         }
     }
 }
