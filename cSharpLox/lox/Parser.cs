@@ -12,9 +12,20 @@ namespace interpreter.lox.parser
         {
             public ParseError() : base() { }
         }
-        Parser(List<Token> tokens)
+        public Parser(List<Token> tokens)
         {
             this.tokens = tokens;
+        }
+        public Expr parse()
+        {
+            try
+            {
+                return expression();
+            }
+            catch (ParseError error)
+            {
+                return null;
+            }
         }
         private Expr expression()
         {
@@ -96,6 +107,7 @@ namespace interpreter.lox.parser
                 consume(RIGHT_PAREN, "Expect ')' after expression.");
                 return Grouping.Create(expr);
             }
+            throw error(peek(), "Expect expression.");
         }
 
         private Token consume(TokenType type, String message)
@@ -148,6 +160,28 @@ namespace interpreter.lox.parser
         private Token previous()
         {
             return tokens.ElementAt(current - 1);
+        }
+
+        private void synchronize()
+        {
+            advance();
+            while (isAtEnd())
+            {
+                if (previous().type == SEMICOLON) return;
+                switch (peek().type)
+                {
+                    case CLASS:
+                    case FUN:
+                    case VAR:
+                    case FOR:
+                    case IF:
+                    case WHILE:
+                    case PRINT:
+                    case RETURN:
+                        return;
+                }
+            }
+            advance();
         }
     }
 }

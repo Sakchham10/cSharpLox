@@ -46,6 +46,7 @@ namespace interpreter.lox.scanner
                 scanToken();
             }
             Token newToken = new Token(TokenType.EOF, "", null, line);
+            tokens.Add(newToken);
             return tokens;
         }
 

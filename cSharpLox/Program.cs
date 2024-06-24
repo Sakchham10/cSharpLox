@@ -1,4 +1,7 @@
 ﻿using System.Text;
+using interpreter.lox.astPrinter;
+using interpreter.lox.expr;
+using interpreter.lox.parser;
 using interpreter.lox.scanner;
 using interpreter.lox.token;
 using static interpreter.lox.tokentype.TokenType;
@@ -49,7 +52,10 @@ namespace interpreter.lox
         {
             Scanner scanner = new Scanner(source);
             List<Token> tokens = scanner.scanTokens();
-            tokens.ForEach((token) => Console.WriteLine(token.toString()));
+            int lastLine = tokens.Last().line;
+            Parser parser = new Parser(tokens);
+            Expr expression = parser.parse();
+            Console.WriteLine(new AstPrinter().print(expression));
         }
 
         public static void error(int line, String message)
