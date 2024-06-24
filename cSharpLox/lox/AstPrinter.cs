@@ -3,6 +3,10 @@ namespace interpreter.lox.astPrinter
 {
     class AstPrinter : Expr.Visitor<string>
     {
+        public string print(Expr expr)
+        {
+            return expr.accept<string>(this);
+        }
 
         public string visitBinaryExpr(Binary expr)
         {
@@ -29,6 +33,7 @@ namespace interpreter.lox.astPrinter
         {
             StringWriter writer = new StringWriter();
             writer.Write("(");
+            writer.Write(name);
             foreach (Expr expression in expr)
             {
                 writer.Write(" ");
