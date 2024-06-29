@@ -1,8 +1,5 @@
-using interpreter.lox.expr;
-using interpreter.lox.token;
-using interpreter.lox.tokentype;
-using static interpreter.lox.tokentype.TokenType;
-namespace interpreter.lox.parser
+using static interpreter.lox.TokenType;
+namespace interpreter.lox
 {
     public class Parser
     {
@@ -122,7 +119,7 @@ namespace interpreter.lox.parser
             return new ParseError();
         }
 
-        private bool match(params tokentype.TokenType[] tokens)
+        private bool match(params TokenType[] tokens)
         {
             foreach (TokenType token in tokens)
             {

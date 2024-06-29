@@ -1,7 +1,7 @@
 using interpreter.lox.token;
 using interpreter.lox.tokentype;
 
-namespace interpreter.lox.scanner
+namespace interpreter.lox
 {
     public class Scanner
     {

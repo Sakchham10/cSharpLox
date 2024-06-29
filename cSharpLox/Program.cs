@@ -1,16 +1,11 @@
 ﻿using System.Text;
-using interpreter.lox.astPrinter;
-using interpreter.lox.expr;
-using interpreter.lox.parser;
-using interpreter.lox.scanner;
-using interpreter.lox.token;
-using static interpreter.lox.tokentype.TokenType;
-
+using static interpreter.lox.TokenType;
 namespace interpreter.lox
 {
     public class Lox
     {
-        static Boolean hadError = false;
+        static bool hadError = false;
+        static bool hadRunTimeError = false;
         public static void Main(String[] args)
         {
             if (args.Length > 1)
@@ -61,6 +56,12 @@ namespace interpreter.lox
         public static void error(int line, String message)
         {
             report(line, "", message);
+        }
+
+        public static void runTimeError(RuntimeError error)
+        {
+            Console.Error.WriteLine(error.Message + "\n[line " + error.token.line + "]");
+            hadRunTimeError = true;
         }
 
         private static void report(int line, string where, string message)

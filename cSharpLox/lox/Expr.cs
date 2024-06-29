@@ -1,5 +1,4 @@
-using interpreter.lox.token;
-namespace interpreter.lox.expr;
+namespace interpreter.lox;
 
 public abstract class Expr
 {

@@ -1,4 +1,4 @@
-namespace interpreter.lox.tokentype
+namespace interpreter.lox
 {
     public enum TokenType
     {
