@@ -4,6 +4,7 @@ namespace interpreter.lox
 {
     public class Lox
     {
+        private static readonly Interpreter interpreter = new Interpreter();
         static bool hadError = false;
         static bool hadRunTimeError = false;
         public static void Main(String[] args)
@@ -28,7 +29,8 @@ namespace interpreter.lox
             byte[] bytes = File.ReadAllBytes(path);
             String content = Encoding.Default.GetString(bytes);
             run(content);
-            if (hadError == true) Environment.Exit(65);
+            if (hadError) Environment.Exit(65);
+            if (hadRunTimeError) Environment.Exit(70);
         }
 
         private static void runPrompt()
@@ -50,6 +52,8 @@ namespace interpreter.lox
             int lastLine = tokens.Last().line;
             Parser parser = new Parser(tokens);
             Expr expression = parser.parse();
+            if (hadError) return;
+            interpreter.interpret(expression);
             Console.WriteLine(new AstPrinter().print(expression));
         }
 

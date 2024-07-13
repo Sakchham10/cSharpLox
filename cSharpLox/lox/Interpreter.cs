@@ -67,6 +67,8 @@ namespace interpreter.lox
                     throw new RuntimeError(expr.oper, "Operands must be two numbers or two strings");
                 case (SLASH):
                     checkNumberOperands(expr.oper, left, right);
+                    if ((double)right == (double)0)
+                        throw new RuntimeError(expr.oper, "Cannot divide by 0");
                     return (double)left / (double)right;
                 case (STAR):
                     checkNumberOperands(expr.oper, left, right);

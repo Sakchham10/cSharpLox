@@ -1,4 +1,3 @@
-using interpreter.lox.expr;
 namespace interpreter.lox
 {
     class AstPrinter : Expr.Visitor<string>
