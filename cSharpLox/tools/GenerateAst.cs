@@ -13,12 +13,17 @@ namespace interpreter.tools
                 Environment.Exit(65);
             }
             string outputDir = args[0];
-            defineAst(outputDir, "Expr", new List<string>{
-                    "Binary : Expr left, Token Operator, Expr right",
-                    "Grouping : Expr expression",
-                    "Literal : Object value",
-                    "Unary : Token Operator, Expr right",
-                    });
+            //            defineAst(outputDir, "Expr", new List<string>{
+            //                    "Binary : Expr left, Token Operator, Expr right",
+            //                    "Grouping : Expr expression",
+            //                    "Literal : Object value",
+            //                    "Unary : Token Operator, Expr right",
+            //                    });
+            defineAst(outputDir, "Stmt", new List<string>
+            {
+            "Expression : Expr expression",
+            "Print :Expr expression"
+            });
 
         }
 
@@ -27,13 +32,12 @@ namespace interpreter.tools
             string path = outputDir + "/" + baseName + ".cs";
             StreamWriter writer = new StreamWriter(path, false);
 
-            writer.WriteLine("using interpreter.lox.token;");
-            writer.WriteLine("namespace interpreter.lox.expr ;");
+            writer.WriteLine("namespace interpreter.lox ;");
             writer.WriteLine();
             writer.WriteLine();
             writer.WriteLine("public abstract class " + baseName + " {");
             writer.WriteLine();
-            writer.WriteLine("  protected abstract T accept<T>(Visitor<T> visitor);");
+            writer.WriteLine("  public abstract T accept<T>(Visitor<T> visitor);");
             defineVisitor(writer, baseName, types);
             writer.WriteLine("}");
             foreach (string type in types)
@@ -64,7 +68,7 @@ namespace interpreter.tools
             writer.WriteLine("    }");
             // Visitor pattern.
             writer.WriteLine();
-            writer.WriteLine("    protected override T accept<T>(Visitor<T> visitor) {");
+            writer.WriteLine("    public override T accept<T>(Visitor<T> visitor) {");
             writer.WriteLine("      return visitor.visit" +
                 className + baseName + "(this);");
             writer.WriteLine("    }");
@@ -85,7 +89,7 @@ namespace interpreter.tools
             {
                 string type = field.Split(" ")[0];
                 string name = field.Split(" ")[1];
-                writer.WriteLine("    static " + type + " " + "_" + name + ";");
+                writer.WriteLine("public " + type + " " + "_" + name + ";");
             }
 
             writer.WriteLine("  }");
@@ -94,7 +98,7 @@ namespace interpreter.tools
 
         private static void defineVisitor(StreamWriter writer, string baseName, List<string> types)
         {
-            writer.WriteLine(" protected interface Visitor<T> {");
+            writer.WriteLine(" public interface Visitor<T> {");
             foreach (string type in types)
             {
                 string typeName = type.Split(":")[0].Trim();

@@ -1,15 +1,16 @@
 using static interpreter.lox.TokenType;
-
 namespace interpreter.lox
 {
-    public class Interpreter : Expr.Visitor<Object>
+    public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Expression?>
     {
-        public void interpret(Expr expression)
+        public void interpret(List<Stmt> statements)
         {
             try
             {
-                Object value = evaluate(expression);
-                Console.WriteLine(stringfy(value));
+                foreach (Stmt statement in statements)
+                {
+                    execute(statement);
+                }
             }
             catch (RuntimeError err)
             {
@@ -119,6 +120,26 @@ namespace interpreter.lox
             return expr.accept(this);
         }
 
+        private void execute(Stmt stmt)
+        {
+            stmt.accept(this);
+        }
+
+        //Using nullable expression because c# doesn't allow void to be a generic function type return
+        //Could have used any other nullbale type, but expression seemed the best because that is what follows a statement
+        public Expression? visitExpressionStmt(Expression stmt)
+        {
+            evaluate(stmt._expression);
+            return null;
+        }
+
+        public Expression? visitPrintStmt(Print stmt)
+        {
+            Object value = evaluate(stmt._expression);
+            Console.WriteLine(stringfy(value));
+            return null;
+        }
+
         private bool isTruthy(Object obj)
         {
             if (obj == null) return false;
@@ -133,6 +154,7 @@ namespace interpreter.lox
             if (b == null) return false;
             return a.Equals(b);
         }
+
     }
 }
 

@@ -51,10 +51,9 @@ namespace interpreter.lox
             List<Token> tokens = scanner.scanTokens();
             int lastLine = tokens.Last().line;
             Parser parser = new Parser(tokens);
-            Expr expression = parser.parse();
+            List<Stmt> statements = parser.parse();
             if (hadError) return;
-            interpreter.interpret(expression);
-            Console.WriteLine(new AstPrinter().print(expression));
+            interpreter.interpret(statements);
         }
 
         public static void error(int line, String message)

@@ -13,20 +13,36 @@ namespace interpreter.lox
         {
             this.tokens = tokens;
         }
-        public Expr parse()
+        public List<Stmt> parse()
         {
-            try
+            List<Stmt> statements = new List<Stmt>();
+            while (!isAtEnd())
             {
-                return expression();
+                statements.Add(statement());
             }
-            catch (ParseError error)
-            {
-                return null;
-            }
+            return statements;
         }
         private Expr expression()
         {
             return equality();
+        }
+        private Stmt statement()
+        {
+            if (match(PRINT)) return printStatement();
+            return expressionStatement();
+        }
+
+        private Stmt printStatement()
+        {
+            Expr expr = expression();
+            consume(SEMICOLON, "Expect ';' after value.");
+            return Print.Create(expr);
+        }
+        private Stmt expressionStatement()
+        {
+            Expr expr = expression();
+            consume(SEMICOLON, "Expect ';' after value.");
+            return Print.Create(expr);
         }
 
         private Expr equality()
