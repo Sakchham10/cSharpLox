@@ -9,13 +9,14 @@ public abstract class Stmt
     {
         T visitExpressionStmt(Expression stmt);
         T visitPrintStmt(Print stmt);
+        T visitVarStmt(Var stmt);
     }
 }
 public class Expression : Stmt
 {
     private Expression(Expr expression)
     {
-        _expression = expression;
+        expression = expression;
     }
 
     public override T accept<T>(Visitor<T> visitor)
@@ -27,13 +28,13 @@ public class Expression : Stmt
     {
         return new Expression(expression);
     }
-    public Expr _expression;
+    public Expr expression;
 }
 public class Print : Stmt
 {
     private Print(Expr expression)
     {
-        _expression = expression;
+        expression = expression;
     }
 
     public override T accept<T>(Visitor<T> visitor)
@@ -45,5 +46,25 @@ public class Print : Stmt
     {
         return new Print(expression);
     }
-    public Expr _expression;
+    public Expr expression;
+}
+public class Var : Stmt
+{
+    private Var(Token name, Expr initializer)
+    {
+        name = name;
+        initializer = initializer;
+    }
+
+    public override T accept<T>(Visitor<T> visitor)
+    {
+        return visitor.visitVarStmt(this);
+    }
+
+    public static Var Create(Token name, Expr initializer)
+    {
+        return new Var(name, initializer);
+    }
+    public Token name;
+    public Expr initializer;
 }

@@ -13,16 +13,18 @@ namespace interpreter.tools
                 Environment.Exit(65);
             }
             string outputDir = args[0];
-            //            defineAst(outputDir, "Expr", new List<string>{
-            //                    "Binary : Expr left, Token Operator, Expr right",
-            //                    "Grouping : Expr expression",
-            //                    "Literal : Object value",
-            //                    "Unary : Token Operator, Expr right",
-            //                    });
+            defineAst(outputDir, "Expr", new List<string>{
+                                "Binary : Expr left, Token oper, Expr right",
+                                "Grouping : Expr expression",
+                                "Literal : Object value",
+                                "Unary : Token oper, Expr right",
+                                "Variable : Token name"
+                                });
             defineAst(outputDir, "Stmt", new List<string>
             {
             "Expression : Expr expression",
-            "Print :Expr expression"
+            "Print : Expr expression",
+            "Var : Token name, Expr initializer"
             });
 
         }
@@ -62,7 +64,7 @@ namespace interpreter.tools
             foreach (string field in fields)
             {
                 string name = field.Split(" ")[1];
-                writer.WriteLine("_" + name + " = " + name + ";");
+                writer.WriteLine(name + " = " + name + ";");
             }
 
             writer.WriteLine("    }");
@@ -89,7 +91,7 @@ namespace interpreter.tools
             {
                 string type = field.Split(" ")[0];
                 string name = field.Split(" ")[1];
-                writer.WriteLine("public " + type + " " + "_" + name + ";");
+                writer.WriteLine("public " + type + " " + name + ";");
             }
 
             writer.WriteLine("  }");

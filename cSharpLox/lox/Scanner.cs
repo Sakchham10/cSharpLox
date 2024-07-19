@@ -165,8 +165,13 @@ namespace interpreter.lox
 
         private void addToken(TokenType type, Object literal)
         {
-            String text = source.Substring(start, current - start);
+            String text = subString(source, start, current);
             tokens.Add(new Token(type, text, literal, line));
+        }
+
+        private string subString(string text, int start, int end)
+        {
+            return text.Substring(start, end - start);
         }
 
         private bool isDigit(char c)
@@ -189,7 +194,7 @@ namespace interpreter.lox
             }
             //Consume the ending " character
             advance();
-            String value = source.Substring(start + 1, current - start - 1);
+            String value = subString(source, start + 1, current - 1);
             addToken(TokenType.STRING, value);
         }
 
@@ -213,7 +218,7 @@ namespace interpreter.lox
             String text = source.Substring(start, current - start);
             keywords.TryGetValue(text, out TokenType type);
             if ((int)type == 0) type = TokenType.IDENTIFIER;
-            addToken(TokenType.IDENTIFIER, type);
+            addToken(type);
         }
 
         private bool isAlpha(char c)

@@ -18,10 +18,25 @@ namespace interpreter.lox
             List<Stmt> statements = new List<Stmt>();
             while (!isAtEnd())
             {
-                statements.Add(statement());
+                statements.Add(declaration());
             }
             return statements;
         }
+
+        private Stmt declaration()
+        {
+            try
+            {
+                if (match(VAR)) return varDeclaration();
+                return statement();
+            }
+            catch (ParseError error)
+            {
+                synchronize();
+                return null;
+            }
+        }
+
         private Expr expression()
         {
             return equality();
@@ -37,6 +52,18 @@ namespace interpreter.lox
             Expr expr = expression();
             consume(SEMICOLON, "Expect ';' after value.");
             return Print.Create(expr);
+        }
+
+        private Stmt varDeclaration()
+        {
+            Token name = consume(IDENTIFIER, "Expect variable name.");
+            Expr initializer = null;
+            if (match(EQUAL))
+            {
+                initializer = expression();
+            }
+            consume(SEMICOLON, "Expect ; after variable declaration.");
+            return Var.Create(name, initializer);
         }
         private Stmt expressionStatement()
         {
@@ -113,6 +140,10 @@ namespace interpreter.lox
             if (match(NUMBER, STRING))
             {
                 return Literal.Create(previous().literal);
+            }
+            if (match(IDENTIFIER))
+            {
+                return Variable.Create(previous());
             }
             if (match(LEFT_PAREN))
             {

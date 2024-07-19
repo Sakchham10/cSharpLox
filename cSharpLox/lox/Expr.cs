@@ -1,5 +1,6 @@
 namespace interpreter.lox;
 
+
 public abstract class Expr
 {
 
@@ -10,15 +11,16 @@ public abstract class Expr
         T visitGroupingExpr(Grouping expr);
         T visitLiteralExpr(Literal expr);
         T visitUnaryExpr(Unary expr);
+        T visitVariableExpr(Variable expr);
     }
 }
 public class Binary : Expr
 {
-    private Binary(Expr _left, Token _operator, Expr _right)
+    private Binary(Expr left, Token oper, Expr right)
     {
-        left = _left;
-        oper = _operator;
-        right = _right;
+        left = left;
+        oper = oper;
+        right = right;
     }
 
     public override T accept<T>(Visitor<T> visitor)
@@ -26,9 +28,9 @@ public class Binary : Expr
         return visitor.visitBinaryExpr(this);
     }
 
-    public static Binary Create(Expr left, Token Operator, Expr right)
+    public static Binary Create(Expr left, Token oper, Expr right)
     {
-        return new Binary(left, Operator, right);
+        return new Binary(left, oper, right);
     }
     public Expr left;
     public Token oper;
@@ -36,9 +38,9 @@ public class Binary : Expr
 }
 public class Grouping : Expr
 {
-    private Grouping(Expr _expression)
+    private Grouping(Expr expression)
     {
-        expression = _expression;
+        expression = expression;
     }
 
     public override T accept<T>(Visitor<T> visitor)
@@ -54,9 +56,9 @@ public class Grouping : Expr
 }
 public class Literal : Expr
 {
-    private Literal(Object _value)
+    private Literal(Object value)
     {
-        value = _value;
+        value = value;
     }
 
     public override T accept<T>(Visitor<T> visitor)
@@ -72,10 +74,10 @@ public class Literal : Expr
 }
 public class Unary : Expr
 {
-    private Unary(Token _operator, Expr _right)
+    private Unary(Token oper, Expr right)
     {
-        oper = _operator;
-        right = _right;
+        oper = oper;
+        right = right;
     }
 
     public override T accept<T>(Visitor<T> visitor)
@@ -83,10 +85,28 @@ public class Unary : Expr
         return visitor.visitUnaryExpr(this);
     }
 
-    public static Unary Create(Token Operator, Expr right)
+    public static Unary Create(Token oper, Expr right)
     {
-        return new Unary(Operator, right);
+        return new Unary(oper, right);
     }
     public Token oper;
     public Expr right;
+}
+public class Variable : Expr
+{
+    private Variable(Token name)
+    {
+        name = name;
+    }
+
+    public override T accept<T>(Visitor<T> visitor)
+    {
+        return visitor.visitVariableExpr(this);
+    }
+
+    public static Variable Create(Token name)
+    {
+        return new Variable(name);
+    }
+    public Token name;
 }

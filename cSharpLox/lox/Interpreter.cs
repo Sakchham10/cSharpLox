@@ -102,10 +102,14 @@ namespace interpreter.lox
             return null;
 
         }
+        public object visitVarExpr(Var expr)
+        {
+            return null;
+        }
 
         private void checkNumberOperand(Token oper, Object operand)
         {
-            if (operand.GetType().Equals(typeof(double))) return;
+            if (operand is double) return;
             throw new RuntimeError(oper, "Operand must be a number");
         }
 
