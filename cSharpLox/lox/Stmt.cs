@@ -9,8 +9,10 @@ public abstract class Stmt
     {
         T visitBlockStmt(Block stmt);
         T visitExpressionStmt(Expression stmt);
+        T visitIfStmt(If stmt);
         T visitPrintStmt(Print stmt);
         T visitVarStmt(Var stmt);
+        T visitWhileStmt(While stmt);
     }
 }
 public class Block : Stmt
@@ -49,6 +51,28 @@ public class Expression : Stmt
     }
     public Expr _expression;
 }
+public class If : Stmt
+{
+    private If(Expr condition, Stmt thenBranch, Stmt elseBranch)
+    {
+        _condition = condition;
+        _thenBranch = thenBranch;
+        _elseBranch = elseBranch;
+    }
+
+    public override T accept<T>(Visitor<T> visitor)
+    {
+        return visitor.visitIfStmt(this);
+    }
+
+    public static If Create(Expr condition, Stmt thenBranch, Stmt elseBranch)
+    {
+        return new If(condition, thenBranch, elseBranch);
+    }
+    public Expr _condition;
+    public Stmt _thenBranch;
+    public Stmt _elseBranch;
+}
 public class Print : Stmt
 {
     private Print(Expr expression)
@@ -86,4 +110,24 @@ public class Var : Stmt
     }
     public Token _name;
     public Expr _initializer;
+}
+public class While : Stmt
+{
+    private While(Expr condition, Stmt body)
+    {
+        _condition = condition;
+        _body = body;
+    }
+
+    public override T accept<T>(Visitor<T> visitor)
+    {
+        return visitor.visitWhileStmt(this);
+    }
+
+    public static While Create(Expr condition, Stmt body)
+    {
+        return new While(condition, body);
+    }
+    public Expr _condition;
+    public Stmt _body;
 }

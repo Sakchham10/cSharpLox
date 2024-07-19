@@ -9,6 +9,7 @@ public abstract class Expr {
  T visitBinaryExpr(Binary expr);
  T visitGroupingExpr(Grouping expr);
  T visitLiteralExpr(Literal expr);
+ T visitLogicalExpr(Logical expr);
  T visitUnaryExpr(Unary expr);
  T visitVariableExpr(Variable expr);
 }
@@ -70,6 +71,23 @@ _value = value;
    public static Literal Create(Object value) {
    return new Literal(value) ;}
 public Object _value;
+  }
+  public class Logical : Expr {
+  private Logical(Expr left, Token oper, Expr right) {
+_left = left;
+_oper = oper;
+_right = right;
+    }
+
+    public override T accept<T>(Visitor<T> visitor) {
+      return visitor.visitLogicalExpr(this);
+    }
+
+   public static Logical Create(Expr left, Token oper, Expr right) {
+   return new Logical(left,oper,right) ;}
+public Expr _left;
+public Token _oper;
+public Expr _right;
   }
   public class Unary : Expr {
   private Unary(Token oper, Expr right) {

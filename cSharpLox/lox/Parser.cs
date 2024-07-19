@@ -44,8 +44,76 @@ namespace interpreter.lox
         private Stmt statement()
         {
             if (match(PRINT)) return printStatement();
+            if (match(IF)) return ifStatement();
+            if (match(WHILE)) return whileStatement();
+            if (match(FOR)) return forStatement();
             if (match(LEFT_BRACE)) return Block.Create(block());
             return expressionStatement();
+        }
+
+        private Stmt forStatement()
+        {
+            consume(LEFT_PAREN, "Expect '(' after 'for'.");
+            Stmt initializer;
+            if (match(SEMICOLON))
+            {
+                initializer = null;
+            }
+            else if (match(VAR))
+            {
+                initializer = varDeclaration();
+            }
+            else
+            {
+                initializer = expressionStatement();
+            }
+            Expr condition = null;
+            if (!check(SEMICOLON))
+            {
+                condition = expression();
+            }
+            consume(SEMICOLON, "Expect ';' after loop condition.");
+            Expr increament = null;
+            if (!check(RIGHT_PAREN))
+            {
+                increament = expression();
+            }
+            consume(RIGHT_PAREN, "Expect ')' after loop.");
+            Stmt body = statement();
+            if (increament != null)
+            {
+                body = Block.Create(new List<Stmt> { body, Expression.Create(increament) });
+            }
+            if (condition == null) condition = Literal.Create(true);
+            if (initializer != null)
+            {
+                body = Block.Create(new List<Stmt> { initializer, body });
+            }
+            body = While.Create(condition, body);
+            return body;
+        }
+
+        private Stmt whileStatement()
+        {
+            consume(LEFT_PAREN, "Expect '(' after 'while'.");
+            Expr condition = expression();
+            consume(RIGHT_PAREN, "Expect ')' after condition.");
+            Stmt body = statement();
+            return While.Create(condition, body);
+        }
+
+        private Stmt ifStatement()
+        {
+            consume(LEFT_PAREN, "Expect '(' after if.");
+            Expr condition = expression();
+            consume(RIGHT_PAREN, "Expect ')' after condition.");
+            Stmt thenBranch = statement();
+            Stmt elsebranch = null;
+            if (match(ELSE))
+            {
+                elsebranch = statement();
+            }
+            return If.Create(condition, thenBranch, elsebranch);
         }
 
         private List<Stmt> block()
@@ -87,7 +155,7 @@ namespace interpreter.lox
 
         private Expr assignment()
         {
-            Expr expr = equality();
+            Expr expr = or();
             if (match(EQUAL))
             {
                 Token equals = previous();
@@ -101,6 +169,31 @@ namespace interpreter.lox
             }
             return expr;
 
+        }
+
+        private Expr or()
+        {
+            Expr expr = and();
+            while (match(OR))
+            {
+                Token oper = previous();
+                Expr right = and();
+                expr = Logical.Create(expr, oper, right);
+            }
+            return expr;
+
+        }
+
+        private Expr and()
+        {
+            Expr expr = equality();
+            while (match(AND))
+            {
+                Token oper = previous();
+                Expr right = equality();
+                expr = Logical.Create(expr, oper, right);
+            }
+            return expr;
         }
 
         private Expr equality()

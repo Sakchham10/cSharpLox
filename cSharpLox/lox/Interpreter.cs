@@ -201,6 +201,43 @@ namespace interpreter.lox
             executeBlock(stmt._statements, new Env(environment));
             return null;
         }
+
+        public Expression? visitIfStmt(If stmt)
+        {
+            if (isTruthy(evaluate(stmt._condition)))
+            {
+                execute(stmt._thenBranch);
+            }
+            else if (isTruthy(stmt._elseBranch != null))
+            {
+                execute(stmt._elseBranch);
+            }
+            return null;
+
+        }
+
+        public object visitLogicalExpr(Logical expr)
+        {
+            object left = evaluate(expr._left);
+            if (expr._oper.type == OR)
+            {
+                if (isTruthy(left)) return left;
+            }
+            else
+            {
+                if (!isTruthy(left)) return left;
+            }
+            return evaluate(expr._right);
+        }
+
+        public Expression? visitWhileStmt(While stmt)
+        {
+            while (isTruthy(evaluate(stmt._condition)))
+            {
+                execute(stmt._body);
+            }
+            return null;
+        }
     }
 }
 
