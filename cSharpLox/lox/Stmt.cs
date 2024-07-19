@@ -7,16 +7,35 @@ public abstract class Stmt
     public abstract T accept<T>(Visitor<T> visitor);
     public interface Visitor<T>
     {
+        T visitBlockStmt(Block stmt);
         T visitExpressionStmt(Expression stmt);
         T visitPrintStmt(Print stmt);
         T visitVarStmt(Var stmt);
     }
 }
+public class Block : Stmt
+{
+    private Block(List<Stmt> statements)
+    {
+        _statements = statements;
+    }
+
+    public override T accept<T>(Visitor<T> visitor)
+    {
+        return visitor.visitBlockStmt(this);
+    }
+
+    public static Block Create(List<Stmt> statements)
+    {
+        return new Block(statements);
+    }
+    public List<Stmt> _statements;
+}
 public class Expression : Stmt
 {
     private Expression(Expr expression)
     {
-        expression = expression;
+        _expression = expression;
     }
 
     public override T accept<T>(Visitor<T> visitor)
@@ -28,13 +47,13 @@ public class Expression : Stmt
     {
         return new Expression(expression);
     }
-    public Expr expression;
+    public Expr _expression;
 }
 public class Print : Stmt
 {
     private Print(Expr expression)
     {
-        expression = expression;
+        _expression = expression;
     }
 
     public override T accept<T>(Visitor<T> visitor)
@@ -46,14 +65,14 @@ public class Print : Stmt
     {
         return new Print(expression);
     }
-    public Expr expression;
+    public Expr _expression;
 }
 public class Var : Stmt
 {
     private Var(Token name, Expr initializer)
     {
-        name = name;
-        initializer = initializer;
+        _name = name;
+        _initializer = initializer;
     }
 
     public override T accept<T>(Visitor<T> visitor)
@@ -65,6 +84,6 @@ public class Var : Stmt
     {
         return new Var(name, initializer);
     }
-    public Token name;
-    public Expr initializer;
+    public Token _name;
+    public Expr _initializer;
 }

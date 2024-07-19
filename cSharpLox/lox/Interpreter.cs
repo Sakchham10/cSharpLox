@@ -3,6 +3,7 @@ namespace interpreter.lox
 {
     public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Expression?>
     {
+        private Env environment = new Env();
         public void interpret(List<Stmt> statements)
         {
             try
@@ -33,28 +34,28 @@ namespace interpreter.lox
         }
         public object visitBinaryExpr(Binary expr)
         {
-            Object left = evaluate(expr.left);
-            Object right = evaluate(expr.right);
-            switch (expr.oper.type)
+            Object left = evaluate(expr._left);
+            Object right = evaluate(expr._right);
+            switch (expr._oper.type)
             {
                 case (GREATER_THAN):
-                    checkNumberOperands(expr.oper, left, right);
+                    checkNumberOperands(expr._oper, left, right);
                     return (double)left > (double)right;
                 case (GREATER_EQUAL):
-                    checkNumberOperands(expr.oper, left, right);
+                    checkNumberOperands(expr._oper, left, right);
                     return (double)left >= (double)right;
                 case (LESS_THAN):
-                    checkNumberOperands(expr.oper, left, right);
+                    checkNumberOperands(expr._oper, left, right);
                     return (double)left > (double)right;
                 case (LESS_EQUAL):
                     return (double)left >= (double)right;
                 case (MINUS):
-                    checkNumberOperands(expr.oper, left, right);
+                    checkNumberOperands(expr._oper, left, right);
                     return (double)left - (double)right;
                 case (BANG_EQUAL):
                     return !isEqual(left, right);
                 case (EQUAL_EQUAL):
-                    checkNumberOperands(expr.oper, left, right);
+                    checkNumberOperands(expr._oper, left, right);
                     return isEqual(left, right);
                 case (PLUS):
                     if (left.GetType().Equals(typeof(double)) && right.GetType().Equals(typeof(double)))
@@ -65,14 +66,14 @@ namespace interpreter.lox
                     {
                         return (string)left + (string)right;
                     }
-                    throw new RuntimeError(expr.oper, "Operands must be two numbers or two strings");
+                    throw new RuntimeError(expr._oper, "Operands must be two numbers or two strings");
                 case (SLASH):
-                    checkNumberOperands(expr.oper, left, right);
+                    checkNumberOperands(expr._oper, left, right);
                     if ((double)right == (double)0)
-                        throw new RuntimeError(expr.oper, "Cannot divide by 0");
+                        throw new RuntimeError(expr._oper, "Cannot divide by 0");
                     return (double)left / (double)right;
                 case (STAR):
-                    checkNumberOperands(expr.oper, left, right);
+                    checkNumberOperands(expr._oper, left, right);
                     return (double)left * (double)right;
             }
             return null;
@@ -80,31 +81,34 @@ namespace interpreter.lox
 
         public object visitGroupingExpr(Grouping expr)
         {
-            return evaluate(expr.expression);
+            return evaluate(expr._expression);
         }
 
         public object visitLiteralExpr(Literal expr)
         {
-            return expr.value;
+            return expr._value;
         }
 
         public object visitUnaryExpr(Unary expr)
         {
-            Object right = evaluate(expr.right);
-            switch (expr.oper.type)
+            Object right = evaluate(expr._right);
+            switch (expr._oper.type)
             {
                 case (BANG):
                     return !isTruthy(right);
                 case (MINUS):
-                    checkNumberOperand(expr.oper, right);
+                    checkNumberOperand(expr._oper, right);
                     return -(double)right;
             }
             return null;
 
         }
-        public object visitVarExpr(Var expr)
+
+        public object visitAssignExpr(Assign expr)
         {
-            return null;
+            object value = evaluate(expr._value);
+            environment.assign(expr._name, value);
+            return value;
         }
 
         private void checkNumberOperand(Token oper, Object operand)
@@ -130,7 +134,6 @@ namespace interpreter.lox
         }
 
         //Using nullable expression because c# doesn't allow void to be a generic function type return
-        //Could have used any other nullbale type, but expression seemed the best because that is what follows a statement
         public Expression? visitExpressionStmt(Expression stmt)
         {
             evaluate(stmt._expression);
@@ -141,6 +144,17 @@ namespace interpreter.lox
         {
             Object value = evaluate(stmt._expression);
             Console.WriteLine(stringfy(value));
+            return null;
+        }
+
+        public Expression? visitVarStmt(Var stmt)
+        {
+            Object value = null;
+            if (stmt._initializer != null)
+            {
+                value = evaluate(stmt._initializer);
+            }
+            environment.define(stmt._name.lexeme, value);
             return null;
         }
 
@@ -159,6 +173,34 @@ namespace interpreter.lox
             return a.Equals(b);
         }
 
+        private void executeBlock(List<Stmt> statements, Env enlosing)
+        {
+            Env previous = this.environment;
+            try
+            {
+                this.environment = enlosing;
+                foreach (Stmt statement in statements)
+                {
+                    execute(statement);
+                }
+            }
+            finally
+            {
+                this.environment = previous;
+            }
+
+        }
+
+        public object visitVariableExpr(Variable expr)
+        {
+            return environment.get(expr._name);
+        }
+
+        public Expression? visitBlockStmt(Block stmt)
+        {
+            executeBlock(stmt._statements, new Env(environment));
+            return null;
+        }
     }
 }
 

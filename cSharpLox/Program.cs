@@ -11,8 +11,8 @@ namespace interpreter.lox
         {
             if (args.Length > 1)
             {
-                Console.WriteLine("Usage: jlox [script]");
                 Environment.Exit(64);
+                Console.WriteLine("Usage: jlox [script]");
             }
             else if (args.Length == 1)
             {
