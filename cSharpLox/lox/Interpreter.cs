@@ -3,7 +3,12 @@ namespace interpreter.lox
 {
     public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Expression?>
     {
-        private Env environment = new Env();
+        readonly static Env global = new Env();
+        private Env environment = global;
+        public Interpreter()
+        {
+            global.define("Clock", new Clock());
+        }
         public void interpret(List<Stmt> statements)
         {
             try
@@ -237,6 +242,26 @@ namespace interpreter.lox
                 execute(stmt._body);
             }
             return null;
+        }
+
+        public object visitCallExpr(Call expr)
+        {
+            object callee = evaluate(expr._callee);
+            List<object> arguments = new List<object>();
+            foreach (Expr argument in expr._arguments)
+            {
+                arguments.Add(evaluate(argument));
+            }
+            if (!(callee is LoxCallable))
+            {
+                throw new RuntimeError(expr._paren, "Can only call functions and classes.");
+            }
+            LoxCallable function = (LoxCallable)callee;
+            if (arguments.Count != function.arity())
+            {
+                throw new RuntimeError(expr._paren, "Expected " + function.arity() + " arguments but got " + arguments.Count + ".");
+            }
+            return function.call(this, arguments);
         }
     }
 }

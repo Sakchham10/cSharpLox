@@ -253,7 +253,44 @@ namespace interpreter.lox
                 Expr right = unary();
                 return Unary.Create(oper, right);
             }
-            return primary();
+            return call();
+        }
+
+        private Expr call()
+        {
+            Expr expr = primary();
+            while (true)
+            {
+                if (match(LEFT_PAREN))
+                {
+                    expr = finishCall(expr);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return expr;
+        }
+
+        private Expr finishCall(Expr callee)
+        {
+            List<Expr> arguments = new List<Expr>();
+            if (!check(RIGHT_PAREN))
+            {
+                do
+                {
+                    if (arguments.Count >= 255)
+                    {
+                        error(peek(), "Can't have more than 255 arguments.");
+                    }
+                    arguments.Add(expression());
+                } while (match(COMMA));
+
+            }
+            Token paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
+            return Call.Create(callee, paren, arguments);
+
         }
 
         private Expr primary()
