@@ -46,10 +46,23 @@ namespace interpreter.lox
         {
             if (match(PRINT)) return printStatement();
             if (match(IF)) return ifStatement();
+            if (match(RETURN)) return returnStatement();
             if (match(WHILE)) return whileStatement();
             if (match(FOR)) return forStatement();
             if (match(LEFT_BRACE)) return Block.Create(block());
             return expressionStatement();
+        }
+
+        private Stmt returnStatement()
+        {
+            Token keyword = previous();
+            Expr value = null;
+            if (!check(SEMICOLON))
+            {
+                value = expression();
+            }
+            consume(SEMICOLON, "Expect ';' after return value.");
+            return Returns.Create(keyword, value);
         }
 
         private Stmt forStatement()

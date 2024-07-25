@@ -267,9 +267,16 @@ namespace interpreter.lox
 
         public Expression? visitFunctionStmt(Function stmt)
         {
-            LoxFunction function = new LoxFunction(stmt);
+            LoxFunction function = new LoxFunction(stmt, environment);
             environment.define(stmt._name.lexeme, function);
             return null;
+        }
+
+        public Expression? visitReturnStmt(Returns stmt)
+        {
+            object value = null;
+            if (stmt._value != null) value = evaluate(stmt._value);
+            throw new Returnval(value);
         }
     }
 }

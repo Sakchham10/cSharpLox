@@ -11,6 +11,7 @@ public abstract class Stmt
         T visitExpressionStmt(Expression stmt);
         T visitFunctionStmt(Function stmt);
         T visitIfStmt(If stmt);
+        T visitReturnStmt(Returns stmt);
         T visitPrintStmt(Print stmt);
         T visitVarStmt(Var stmt);
         T visitWhileStmt(While stmt);
@@ -95,6 +96,26 @@ public class If : Stmt
     public Expr _condition;
     public Stmt _thenBranch;
     public Stmt _elseBranch;
+}
+public class Returns : Stmt
+{
+    private Returns(Token keyword, Expr value)
+    {
+        _keyword = keyword;
+        _value = value;
+    }
+
+    public override T accept<T>(Visitor<T> visitor)
+    {
+        return visitor.visitReturnStmt(this);
+    }
+
+    public static Returns Create(Token keyword, Expr value)
+    {
+        return new Returns(keyword, value);
+    }
+    public Token _keyword;
+    public Expr _value;
 }
 public class Print : Stmt
 {
