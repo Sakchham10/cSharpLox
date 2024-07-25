@@ -9,6 +9,7 @@ public abstract class Stmt
     {
         T visitBlockStmt(Block stmt);
         T visitExpressionStmt(Expression stmt);
+        T visitFunctionStmt(Function stmt);
         T visitIfStmt(If stmt);
         T visitPrintStmt(Print stmt);
         T visitVarStmt(Var stmt);
@@ -50,6 +51,28 @@ public class Expression : Stmt
         return new Expression(expression);
     }
     public Expr _expression;
+}
+public class Function : Stmt
+{
+    private Function(Token name, List<Token> parameters, List<Stmt> body)
+    {
+        _name = name;
+        _parameters = parameters;
+        _body = body;
+    }
+
+    public override T accept<T>(Visitor<T> visitor)
+    {
+        return visitor.visitFunctionStmt(this);
+    }
+
+    public static Function Create(Token name, List<Token> parameters, List<Stmt> body)
+    {
+        return new Function(name, parameters, body);
+    }
+    public Token _name;
+    public List<Token> _parameters;
+    public List<Stmt> _body;
 }
 public class If : Stmt
 {

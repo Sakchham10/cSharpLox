@@ -27,6 +27,7 @@ namespace interpreter.lox
         {
             try
             {
+                if (match(FUN)) return function("function");
                 if (match(VAR)) return varDeclaration();
                 return statement();
             }
@@ -85,11 +86,11 @@ namespace interpreter.lox
                 body = Block.Create(new List<Stmt> { body, Expression.Create(increament) });
             }
             if (condition == null) condition = Literal.Create(true);
+            body = While.Create(condition, body);
             if (initializer != null)
             {
                 body = Block.Create(new List<Stmt> { initializer, body });
             }
-            body = While.Create(condition, body);
             return body;
         }
 
@@ -145,6 +146,28 @@ namespace interpreter.lox
             }
             consume(SEMICOLON, "Expect ; after variable declaration.");
             return Var.Create(name, initializer);
+        }
+
+        private Function function(string kind)
+        {
+            Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
+            consume(LEFT_PAREN, "Expect '(' after" + kind + " name.");
+            List<Token> parameters = new List<Token>();
+            if (!check(RIGHT_PAREN))
+            {
+                do
+                {
+                    if (parameters.Count >= 255)
+                    {
+                        error(peek(), "Cannot have more than 255 parameters.");
+                    }
+                    parameters.Add(consume(IDENTIFIER, "Expect parameter name."));
+                } while (match(COMMA));
+            }
+            consume(RIGHT_PAREN, "Expect ')' after parameters.");
+            consume(LEFT_BRACE, "Expect '{' before " + kind + " declaration.");
+            List<Stmt> body = block();
+            return Function.Create(name, parameters, body);
         }
         private Stmt expressionStatement()
         {

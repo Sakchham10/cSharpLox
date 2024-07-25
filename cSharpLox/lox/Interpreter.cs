@@ -3,11 +3,12 @@ namespace interpreter.lox
 {
     public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Expression?>
     {
-        readonly static Env global = new Env();
+        public readonly static Env global = new Env();
         private Env environment = global;
         public Interpreter()
         {
             global.define("Clock", new Clock());
+
         }
         public void interpret(List<Stmt> statements)
         {
@@ -51,9 +52,9 @@ namespace interpreter.lox
                     return (double)left >= (double)right;
                 case (LESS_THAN):
                     checkNumberOperands(expr._oper, left, right);
-                    return (double)left > (double)right;
+                    return (double)left < (double)right;
                 case (LESS_EQUAL):
-                    return (double)left >= (double)right;
+                    return (double)left <= (double)right;
                 case (MINUS):
                     checkNumberOperands(expr._oper, left, right);
                     return (double)left - (double)right;
@@ -178,7 +179,7 @@ namespace interpreter.lox
             return a.Equals(b);
         }
 
-        private void executeBlock(List<Stmt> statements, Env enlosing)
+        public void executeBlock(List<Stmt> statements, Env enlosing)
         {
             Env previous = this.environment;
             try
@@ -262,6 +263,13 @@ namespace interpreter.lox
                 throw new RuntimeError(expr._paren, "Expected " + function.arity() + " arguments but got " + arguments.Count + ".");
             }
             return function.call(this, arguments);
+        }
+
+        public Expression? visitFunctionStmt(Function stmt)
+        {
+            LoxFunction function = new LoxFunction(stmt);
+            environment.define(stmt._name.lexeme, function);
+            return null;
         }
     }
 }
