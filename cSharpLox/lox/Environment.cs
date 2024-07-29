@@ -20,6 +20,7 @@ namespace interpreter.lox
             values[name] = value;
         }
 
+
         public object get(Token name)
         {
             if (values.TryGetValue(name.lexeme, out object? val))
@@ -29,6 +30,22 @@ namespace interpreter.lox
             if (enclosing != null) return enclosing.get(name);
             throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
 
+        }
+
+        public object getAt(int distance, string name)
+        {
+            return ancestor(distance).values[name];
+
+        }
+
+        private Env ancestor(int distance)
+        {
+            Env environment = this;
+            for (int i = 0; i < distance; i++)
+            {
+                environment = environment.enclosing;
+            }
+            return environment;
         }
 
         public void assign(Token name, object value)
@@ -46,6 +63,9 @@ namespace interpreter.lox
             throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
         }
 
-
+        public void assignAt(int distance, Token name, object value)
+        {
+            ancestor(distance).values[name.lexeme] = value;
+        }
     }
 }

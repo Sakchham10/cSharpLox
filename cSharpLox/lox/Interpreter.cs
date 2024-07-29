@@ -5,6 +5,7 @@ namespace interpreter.lox
     {
         public readonly static Env global = new Env();
         private Env environment = global;
+        private readonly Dictionary<Expr, int> locals = new Dictionary<Expr, int>();
         public Interpreter()
         {
             global.define("Clock", new Clock());
@@ -113,7 +114,14 @@ namespace interpreter.lox
         public object visitAssignExpr(Assign expr)
         {
             object value = evaluate(expr._value);
-            environment.assign(expr._name, value);
+            if (locals.TryGetValue(expr, out int distance))
+            {
+                environment.assignAt(distance, expr._name, value);
+            }
+            else
+            {
+                global.assign(expr._name, value);
+            }
             return value;
         }
 
@@ -199,7 +207,7 @@ namespace interpreter.lox
 
         public object visitVariableExpr(Variable expr)
         {
-            return environment.get(expr._name);
+            return lookUpVariable(expr._name, expr);
         }
 
         public Expression? visitBlockStmt(Block stmt)
@@ -278,6 +286,28 @@ namespace interpreter.lox
             if (stmt._value != null) value = evaluate(stmt._value);
             throw new Returnval(value);
         }
+
+        public void resolve(Expr expr, int depth)
+        {
+            if (!locals.ContainsKey(expr))
+            {
+                locals.Add(expr, 0);
+            }
+            locals[expr] = depth;
+        }
+
+        private object lookUpVariable(Token name, Expr expression)
+        {
+            if (locals.TryGetValue(expression, out int distance))
+            {
+                return environment.getAt(distance, name.lexeme);
+            }
+            else
+            {
+                return global.get(name);
+            }
+        }
     }
+
 }
 
