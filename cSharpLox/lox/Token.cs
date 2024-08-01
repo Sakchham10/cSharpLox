@@ -15,7 +15,7 @@ namespace interpreter.lox
             this.line = line;
         }
 
-        public String toString()
+        public override String ToString()
         {
             return type + " " + lexeme + " " + literal;
         }

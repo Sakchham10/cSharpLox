@@ -14,7 +14,7 @@ public class LoxFunction : LoxCallable
         return _declaration._parameters.Count;
     }
 
-    public string toString()
+    public override string ToString()
     {
         return "<fn " + _declaration._name.lexeme + " >";
     }

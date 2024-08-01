@@ -92,18 +92,6 @@ public class Resolver : Expr.Visitor<object?>, Stmt.Visitor<object?>
         return null;
     }
 
-    public object? visitReturnStmt(Returns stmt)
-    {
-        if (currentFunction == FunctionType.NONE)
-        {
-            Lox.error(stmt._keyword, "Can't return from top-level code.");
-        }
-        if (stmt._value != null)
-        {
-            resolve(stmt._value);
-        }
-        return null;
-    }
 
     public object? visitUnaryExpr(Unary expr)
     {
@@ -212,4 +200,41 @@ public class Resolver : Expr.Visitor<object?>, Stmt.Visitor<object?>
         endScope();
     }
 
+    public object? visitClassStmt(Class stmt)
+    {
+        declare(stmt._name);
+        define(stmt._name);
+        foreach (Function method in stmt._methods)
+        {
+            FunctionType declaration = FunctionType.METHOD;
+            resolveFunction(method, declaration);
+        }
+        return null;
+    }
+
+    public object? visitGetExpr(Get expr)
+    {
+        resolve(expr._expression);
+        return null;
+    }
+
+    public object? visitSetExpr(Set expr)
+    {
+        resolve(expr._value);
+        resolve(expr._expression);
+        return null;
+    }
+
+    public object? visitReturnsStmt(Returns stmt)
+    {
+        if (currentFunction == FunctionType.NONE)
+        {
+            Lox.error(stmt._keyword, "Can't return from top-level code.");
+        }
+        if (stmt._value != null)
+        {
+            resolve(stmt._value);
+        }
+        return null;
+    }
 }

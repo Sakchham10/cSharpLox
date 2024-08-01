@@ -13,23 +13,27 @@ namespace interpreter.tools
                 Environment.Exit(65);
             }
             string outputDir = args[0];
-            defineAst(outputDir, "Expr", new List<string>{
+            defineAst(outputDir, "Expr", new List<string>
+                    {
                                 "Assign : Token name, Expr value",
                                 "Binary : Expr left, Token oper, Expr right",
                                 "Call : Expr callee, Token paren, List<Expr> arguments",
+                                "Get : Expr expression, Token name",
                                 "Grouping : Expr expression",
                                 "Literal : Object value",
                                 "Logical : Expr left, Token oper, Expr right",
+                                "Set : Expr expression, Token name, Expr value",
                                 "Unary : Token oper, Expr right",
                                 "Variable : Token name"
                                 });
             defineAst(outputDir, "Stmt", new List<string>
             {
             "Block: List<Stmt> statements",
+            "Class: Token name, List<Function> methods",
             "Expression : Expr expression",
             "Function : Token name, List<Token> parameters, List<Stmt> body",
             "If : Expr condition, Stmt thenBranch," + " Stmt elseBranch",
-            "Return : Token keyword, Expr value",
+            "Returns : Token keyword, Expr value",
             "Print : Expr expression",
             "Var : Token name, Expr initializer",
             "While : Expr condition, Stmt body"

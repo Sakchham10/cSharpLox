@@ -280,13 +280,6 @@ namespace interpreter.lox
             return null;
         }
 
-        public Expression? visitReturnStmt(Returns stmt)
-        {
-            object value = null;
-            if (stmt._value != null) value = evaluate(stmt._value);
-            throw new Returnval(value);
-        }
-
         public void resolve(Expr expr, int depth)
         {
             if (!locals.ContainsKey(expr))
@@ -306,6 +299,50 @@ namespace interpreter.lox
             {
                 return global.get(name);
             }
+        }
+
+        public Expression? visitClassStmt(Class stmt)
+        {
+            environment.define(stmt._name.lexeme, null);
+
+            Dictionary<string, LoxFunction> methods = new Dictionary<string, LoxFunction>();
+            foreach (Function method in stmt._methods)
+            {
+                LoxFunction function = new LoxFunction(method, environment);
+                methods.Add(method._name.lexeme, function);
+            }
+            LoxClass klass = new LoxClass(stmt._name.lexeme, methods);
+            environment.assign(stmt._name, klass);
+            return null;
+        }
+
+        public object visitGetExpr(Get expr)
+        {
+            object expression = evaluate(expr._expression);
+            if (expression is LoxInstance)
+            {
+                return ((LoxInstance)expression).get(expr._name);
+            }
+            throw new RuntimeError(expr._name, "Only instances have properties.");
+        }
+
+        public object visitSetExpr(Set expr)
+        {
+            object expression = evaluate(expr._expression);
+            if (!(expression is LoxInstance))
+            {
+                throw new RuntimeError(expr._name, "Only instance have fields.");
+            }
+            object value = evaluate(expr._value);
+            ((LoxInstance)expression).set(expr._name, value);
+            return value;
+        }
+
+        public Expression? visitReturnsStmt(Returns stmt)
+        {
+            object value = null;
+            if (stmt._value != null) value = evaluate(stmt._value);
+            throw new Returnval(value);
         }
     }
 

@@ -8,10 +8,11 @@ public abstract class Stmt
     public interface Visitor<T>
     {
         T visitBlockStmt(Block stmt);
+        T visitClassStmt(Class stmt);
         T visitExpressionStmt(Expression stmt);
         T visitFunctionStmt(Function stmt);
         T visitIfStmt(If stmt);
-        T visitReturnStmt(Returns stmt);
+        T visitReturnsStmt(Returns stmt);
         T visitPrintStmt(Print stmt);
         T visitVarStmt(Var stmt);
         T visitWhileStmt(While stmt);
@@ -34,6 +35,26 @@ public class Block : Stmt
         return new Block(statements);
     }
     public List<Stmt> _statements;
+}
+public class Class : Stmt
+{
+    private Class(Token name, List<Function> methods)
+    {
+        _name = name;
+        _methods = methods;
+    }
+
+    public override T accept<T>(Visitor<T> visitor)
+    {
+        return visitor.visitClassStmt(this);
+    }
+
+    public static Class Create(Token name, List<Function> methods)
+    {
+        return new Class(name, methods);
+    }
+    public Token _name;
+    public List<Function> _methods;
 }
 public class Expression : Stmt
 {
@@ -107,7 +128,7 @@ public class Returns : Stmt
 
     public override T accept<T>(Visitor<T> visitor)
     {
-        return visitor.visitReturnStmt(this);
+        return visitor.visitReturnsStmt(this);
     }
 
     public static Returns Create(Token keyword, Expr value)

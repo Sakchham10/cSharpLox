@@ -27,6 +27,7 @@ namespace interpreter.lox
         {
             try
             {
+                if (match(CLASS)) return classDeclaration();
                 if (match(FUN)) return function("function");
                 if (match(VAR)) return varDeclaration();
                 return statement();
@@ -149,6 +150,19 @@ namespace interpreter.lox
             return Print.Create(expr);
         }
 
+        private Stmt classDeclaration()
+        {
+            Token name = consume(IDENTIFIER, "Expect class name.");
+            consume(LEFT_BRACE, "Expect '{' before class body.");
+            List<Function> methods = new List<Function>();
+            while (!check(RIGHT_BRACE) && !isAtEnd())
+            {
+                methods.Add(function("method"));
+            }
+            consume(RIGHT_BRACE, "Expect '}' after class body.");
+            return Class.Create(name, methods);
+        }
+
         private Stmt varDeclaration()
         {
             Token name = consume(IDENTIFIER, "Expect variable name.");
@@ -200,6 +214,11 @@ namespace interpreter.lox
                 {
                     Token name = ((Variable)expr)._name;
                     return Assign.Create(name, value);
+                }
+                else if (expr is Get)
+                {
+                    Get get = (Get)expr;
+                    return Set.Create(get._expression, get._name, value);
                 }
                 error(equals, "Invalid assignment target.");
             }
@@ -300,6 +319,11 @@ namespace interpreter.lox
                 if (match(LEFT_PAREN))
                 {
                     expr = finishCall(expr);
+                }
+                else if (match(DOT))
+                {
+                    Token name = consume(IDENTIFIER, "Expect property name after '.'.");
+                    expr = Get.Create(expr, name);
                 }
                 else
                 {
